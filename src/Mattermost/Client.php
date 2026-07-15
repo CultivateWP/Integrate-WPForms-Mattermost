@@ -8,7 +8,11 @@ use IntegrateWPFormsMattermost\Settings\ConnectionSettings;
 use WP_Error;
 
 final class Client {
-	public function __construct( private ConnectionSettings $settings ) {}
+	public function __construct(
+		private ConnectionSettings $settings,
+		private string $base_url = '',
+		private string $token = ''
+	) {}
 
 	public function create_post( string $channel_id, string $message, string $idempotency_id ): Response {
 		return $this->request(
@@ -72,7 +76,9 @@ final class Client {
 
 	/** @param array<string,mixed>|null $body */
 	private function request( string $method, string $path, ?array $body = null ): Response {
-		if ( ! $this->settings->configured() ) {
+		$base_url = '' !== $this->base_url ? untrailingslashit( $this->base_url ) : $this->settings->base_url();
+		$token    = '' !== $this->token ? $this->token : $this->settings->token();
+		if ( '' === $base_url || '' === $token ) {
 			return new Response( 0, array(), 'not_configured', 'Mattermost is not configured.' );
 		}
 		$args = array(
@@ -80,7 +86,7 @@ final class Client {
 			'timeout'     => 10,
 			'redirection' => 2,
 			'headers'     => array(
-				'Authorization' => 'Bearer ' . $this->settings->token(),
+				'Authorization' => 'Bearer ' . $token,
 				'Content-Type'  => 'application/json',
 				'Accept'        => 'application/json',
 			),
@@ -89,7 +95,7 @@ final class Client {
 			$args['body'] = wp_json_encode( $body );
 		}
 
-		$response = wp_remote_request( $this->settings->base_url() . $path, $args );
+		$response = wp_remote_request( $base_url . $path, $args );
 		if ( is_wp_error( $response ) ) {
 			$code      = $response->get_error_code();
 			$ambiguous = in_array( $code, array( 'http_request_failed', 'connect_timeout', 'operation_timedout' ), true );

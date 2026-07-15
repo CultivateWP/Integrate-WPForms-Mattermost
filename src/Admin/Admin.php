@@ -20,7 +20,6 @@ final class Admin {
 
 	public function hooks(): void {
 		add_action( 'admin_menu', array( $this, 'menu' ) );
-		add_action( 'admin_post_iwmm_save_connection', array( $this, 'save_connection' ) );
 		add_action( 'admin_post_iwmm_refresh_channels', array( $this, 'refresh_channels' ) );
 		add_action( 'admin_post_iwmm_retry_message', array( $this, 'retry_message' ) );
 		add_action( 'admin_post_iwmm_preview_message', array( $this, 'preview_message' ) );
@@ -30,9 +29,10 @@ final class Admin {
 	}
 
 	public function menu(): void {
-		add_options_page(
-			__( 'WPForms Mattermost', 'integrate-wpforms-mattermost' ),
-			__( 'WPForms Mattermost', 'integrate-wpforms-mattermost' ),
+		add_submenu_page(
+			'wpforms-overview',
+			__( 'Mattermost Logs', 'integrate-wpforms-mattermost' ),
+			__( 'Mattermost Logs', 'integrate-wpforms-mattermost' ),
 			'manage_options',
 			'integrate-wpforms-mattermost',
 			array( $this, 'page' )
@@ -49,20 +49,11 @@ final class Admin {
 		delete_transient( 'iwmm_preview_' . get_current_user_id() );
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Integrate WPForms with Mattermost', 'integrate-wpforms-mattermost' ); ?></h1>
+			<h1><?php esc_html_e( 'Mattermost Logs', 'integrate-wpforms-mattermost' ); ?></h1>
 			<?php if ( isset( $_GET['iwmm_notice'] ) ) : ?>
 				<div class="notice notice-info"><p><?php echo esc_html( sanitize_text_field( wp_unslash( $_GET['iwmm_notice'] ) ) ); ?></p></div>
 			<?php endif; ?>
-			<h2><?php esc_html_e( 'Connection', 'integrate-wpforms-mattermost' ); ?></h2>
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-				<input type="hidden" name="action" value="iwmm_save_connection">
-				<?php wp_nonce_field( 'iwmm_save_connection' ); ?>
-				<table class="form-table"><tbody>
-				<tr><th><label for="iwmm-base-url"><?php esc_html_e( 'Mattermost URL', 'integrate-wpforms-mattermost' ); ?></label></th><td><input class="regular-text" type="url" id="iwmm-base-url" name="base_url" value="<?php echo esc_attr( $this->settings->base_url() ); ?>" <?php disabled( defined( 'IWMM_MATTERMOST_URL' ) ); ?>></td></tr>
-				<tr><th><label for="iwmm-token"><?php esc_html_e( 'Bot token', 'integrate-wpforms-mattermost' ); ?></label></th><td><input class="regular-text" type="password" id="iwmm-token" name="token" value="" autocomplete="new-password" placeholder="<?php echo esc_attr( $this->settings->token() ? 'Configured; leave blank to retain' : '' ); ?>" <?php disabled( defined( 'IWMM_MATTERMOST_TOKEN' ) ); ?>></td></tr>
-				</tbody></table>
-				<?php submit_button( __( 'Save connection', 'integrate-wpforms-mattermost' ) ); ?>
-			</form>
+			<p><?php echo esc_html( $this->settings->configured() ? __( 'Mattermost is connected.', 'integrate-wpforms-mattermost' ) : __( 'Mattermost is not connected.', 'integrate-wpforms-mattermost' ) ); ?> <a href="<?php echo esc_url( admin_url( 'admin.php?page=wpforms-settings&view=integrations&wpforms-integration=mattermost' ) ); ?>"><?php esc_html_e( 'Manage the integration', 'integrate-wpforms-mattermost' ); ?></a></p>
 
 			<h2><?php esc_html_e( 'Preview a saved entry', 'integrate-wpforms-mattermost' ); ?></h2>
 			<p><?php esc_html_e( 'Render a feed without sending it. WPForms entry storage is required.', 'integrate-wpforms-mattermost' ); ?></p>
@@ -102,18 +93,6 @@ final class Admin {
 			</tbody></table>
 		</div>
 		<?php
-	}
-
-	public function save_connection(): void {
-		$this->authorize( 'iwmm_save_connection' );
-		$base_url = isset( $_POST['base_url'] ) ? esc_url_raw( wp_unslash( $_POST['base_url'] ) ) : $this->settings->base_url();
-		$token    = isset( $_POST['token'] ) ? sanitize_text_field( wp_unslash( $_POST['token'] ) ) : '';
-		try {
-			$this->settings->save( $base_url, $token );
-			$this->redirect( 'Connection saved.' );
-		} catch ( \Throwable $error ) {
-			$this->redirect( sanitize_text_field( $error->getMessage() ) ?: 'Connection could not be saved.' );
-		}
 	}
 
 	public function refresh_channels(): void {
@@ -199,7 +178,14 @@ final class Admin {
 	}
 
 	public function dependency_notice(): void {
-		if ( class_exists( \WPForms::class ) || ! current_user_can( 'activate_plugins' ) ) {
+		if ( ! current_user_can( 'activate_plugins' ) ) {
+			return;
+		}
+		if ( defined( 'WPFORMS_VERSION' ) && version_compare( (string) WPFORMS_VERSION, '1.9.5', '<' ) ) {
+			echo '<div class="notice notice-warning"><p>' . esc_html__( 'Integrate WPForms with Mattermost requires WPForms 1.9.5 or newer for form connections. The generic enqueue API remains available.', 'integrate-wpforms-mattermost' ) . '</p></div>';
+			return;
+		}
+		if ( class_exists( \WPForms::class ) ) {
 			return;
 		}
 		echo '<div class="notice notice-warning"><p>' . esc_html__( 'Integrate WPForms with Mattermost requires WPForms for form feeds. The generic enqueue API remains available.', 'integrate-wpforms-mattermost' ) . '</p></div>';
@@ -213,7 +199,7 @@ final class Admin {
 	}
 
 	private function redirect( string $notice ): never {
-		wp_safe_redirect( add_query_arg( 'iwmm_notice', rawurlencode( $notice ), admin_url( 'options-general.php?page=integrate-wpforms-mattermost' ) ) );
+		wp_safe_redirect( add_query_arg( 'iwmm_notice', rawurlencode( $notice ), admin_url( 'admin.php?page=integrate-wpforms-mattermost' ) ) );
 		exit;
 	}
 }

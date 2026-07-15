@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require dirname( __DIR__ ) . '/vendor/autoload.php';
+require __DIR__ . '/stubs/wpforms.php';
 
 defined( 'DAY_IN_SECONDS' ) || define( 'DAY_IN_SECONDS', 86400 );
 

@@ -2,6 +2,8 @@
 
 Build a public WordPress plugin that lets administrators define multiple conditional Mattermost feeds inside each WPForms form. Each feed selects a channel and Smart Tag-aware Markdown template and can be disabled, shadowed, or live.
 
+Use WPForms' native provider framework: connection credentials appear under WPForms Settings > Integrations, and per-form connections appear under the Marketing panel. Operational queue history remains a separate WPForms submenu.
+
 The plugin captures successful submissions, renders messages immediately, stores encrypted queue records with deterministic idempotency keys, and performs Mattermost calls asynchronously through Action Scheduler. It provides bounded retries, remote reconciliation after ambiguous timeouts, redacted attempt history, Site Health diagnostics, WP-CLI recovery, privacy erasure, and retention cleanup.
 
 The stable public API is `iwmm_enqueue_message()`, with status lookup and `iwmm_message_succeeded` / `iwmm_message_failed` completion hooks. No unauthenticated REST enqueue endpoint is provided.

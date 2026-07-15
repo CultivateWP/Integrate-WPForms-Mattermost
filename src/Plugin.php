@@ -15,13 +15,22 @@ use IntegrateWPFormsMattermost\Storage\Installer;
 use IntegrateWPFormsMattermost\Storage\MessageRepository;
 use IntegrateWPFormsMattermost\WPForms\FeedListener;
 use IntegrateWPFormsMattermost\WPForms\ImportGuard;
+use IntegrateWPFormsMattermost\WPForms\Migration;
+use IntegrateWPFormsMattermost\WPForms\Provider\Account;
+use IntegrateWPFormsMattermost\WPForms\Provider\Core;
 use IntegrateWPFormsMattermost\WPForms\Reconciler;
 
 final class Plugin {
+	public const PROVIDER_SLUG = 'mattermost';
+
 	private static ?self $instance = null;
 	private bool $booted = false;
 	private bool $loaded = false;
+	private bool $provider_registered = false;
 	private ?MessageService $messages = null;
+	private ?ConnectionSettings $settings = null;
+	private ?FeedListener $listener = null;
+	private ?Account $provider_account = null;
 
 	public static function instance(): self {
 		return self::$instance ??= new self();
@@ -55,17 +64,20 @@ final class Plugin {
 		$crypto     = new Crypto();
 		$repository = new MessageRepository( $crypto );
 		$scheduler  = new Scheduler();
-		$settings   = new ConnectionSettings( $crypto );
+		$this->settings = new ConnectionSettings( $crypto );
 
 		$this->messages = new MessageService( $repository, $scheduler, $crypto );
+		$this->listener = new FeedListener( $this->messages );
+		$this->provider_account = new Account( $this->settings );
 
-		( new Worker( $repository, $scheduler, $settings ) )->hooks();
-		$listener = new FeedListener( $this->messages );
-		$listener->hooks();
+		( new Worker( $repository, $scheduler, $this->settings ) )->hooks();
 		( new ImportGuard() )->hooks();
-		( new Reconciler( $listener ) )->hooks();
-		( new Admin( $repository, $settings, $this->messages, $listener ) )->hooks();
+		( new Migration() )->hooks();
+		( new Reconciler( $this->listener ) )->hooks();
+		( new Admin( $repository, $this->settings, $this->messages, $this->listener ) )->hooks();
 		( new Privacy( $repository ) )->hooks();
+		$this->register_wpforms_provider();
+		add_action( 'wpforms_loaded', array( $this, 'register_wpforms_provider' ) );
 
 		add_action( 'iwmm_cleanup', array( $repository, 'cleanup' ) );
 		add_action( 'iwmm_reconcile_queue', array( $this->messages, 'reconcile_queue' ) );
@@ -73,7 +85,7 @@ final class Plugin {
 		add_action( 'init', array( $this, 'ensure_schedules' ) );
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			Commands::register( $repository, $settings, $this->messages );
+			Commands::register( $repository, $this->settings, $this->messages );
 		}
 	}
 
@@ -83,6 +95,45 @@ final class Plugin {
 		}
 
 		return $this->messages;
+	}
+
+	public function listener(): FeedListener {
+		if ( null === $this->listener ) {
+			$this->load();
+		}
+
+		return $this->listener;
+	}
+
+	public function connection_settings(): ConnectionSettings {
+		if ( null === $this->settings ) {
+			$this->load();
+		}
+
+		return $this->settings;
+	}
+
+	public function provider_account(): Account {
+		if ( null === $this->provider_account ) {
+			$this->load();
+		}
+
+		return $this->provider_account;
+	}
+
+	public function register_wpforms_provider(): void {
+		if (
+			$this->provider_registered ||
+			! defined( 'WPFORMS_VERSION' ) ||
+			version_compare( (string) WPFORMS_VERSION, '1.9.5', '<' ) ||
+			! class_exists( \WPForms\Providers\Providers::class )
+		) {
+			return;
+		}
+
+		$this->provider_registered = true;
+		$this->provider_account()->sync();
+		\WPForms\Providers\Providers::get_instance()->register( Core::get_instance() );
 	}
 
 	public function ensure_schedules(): void {

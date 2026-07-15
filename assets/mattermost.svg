@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Mattermost</title>
+  <path fill="#1c58d9" d="M32 6C17.6 6 6 16.6 6 29.7c0 7.5 3.8 14.2 9.8 18.5L13 58l11.5-5.1c2.4.6 4.9.9 7.5.9 14.4 0 26-10.6 26-24.1S46.4 6 32 6Z"/>
+  <path fill="#fff" d="M20 24h24v5H20zm0 10h17v5H20z"/>
+</svg>

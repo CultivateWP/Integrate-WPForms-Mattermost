@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name:       Integrate WPForms with Mattermost
- * Plugin URI:        https://github.com/billerickson/integrate-wpforms-mattermost
+ * Plugin URI:        https://github.com/CultivateWP/Integrate-WPForms-Mattermost
  * Description:       Send configurable WPForms submission messages to Mattermost reliably.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Requires at least: 6.6
  * Requires PHP:      8.1
  * Author:            Bill Erickson
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'IWMM_VERSION', '1.0.0' );
+define( 'IWMM_VERSION', '1.1.0' );
 define( 'IWMM_API_VERSION', '1.0.0' );
 define( 'IWMM_FILE', __FILE__ );
 define( 'IWMM_DIR', plugin_dir_path( __FILE__ ) );

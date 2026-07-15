@@ -5,6 +5,7 @@ A self-hosted WordPress plugin for sending configurable WPForms submission messa
 ## Features
 
 - Multiple Mattermost feeds per form
+- Native WPForms provider UI for account and form connections
 - WPForms Smart Tag message templates
 - Conditional all/any delivery rules
 - Disabled, shadow, and live modes
@@ -19,12 +20,14 @@ A self-hosted WordPress plugin for sending configurable WPForms submission messa
 
 - WordPress 6.6+
 - PHP 8.1+ with sodium
-- WPForms Lite or Pro for form feeds
+- WPForms Lite or Pro 1.9.5+ for form feeds
 - A Mattermost bot account with access only to the intended channels
 
 ## Installation
 
-Install a release ZIP as a normal WordPress plugin. Configure the Mattermost URL and bot token under **Settings → WPForms Mattermost**, refresh the available channels, then add feeds in the Mattermost section of the WPForms builder.
+Install a release ZIP as a normal WordPress plugin. Configure the Mattermost URL and bot token under **WPForms → Settings → Integrations → Mattermost**. Then edit a form and add one or more connections under **Marketing → Mattermost**.
+
+Queue history, saved-entry previews, channel refresh, confirmed test sends, and retries are available under **WPForms → Mattermost Logs**.
 
 Production sites should run Action Scheduler from real cron:
 

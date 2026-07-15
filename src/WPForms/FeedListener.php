@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IntegrateWPFormsMattermost\WPForms;
 
 use IntegrateWPFormsMattermost\MessageService;
+use IntegrateWPFormsMattermost\Plugin;
 use WP_Error;
 
 final class FeedListener {
@@ -15,19 +16,14 @@ final class FeedListener {
 		$this->evaluator = new FeedEvaluator();
 	}
 
-	public function hooks(): void {
-		add_action( 'wpforms_process_complete', array( $this, 'capture' ), 10, 4 );
-		( new BuilderPanel() )->hooks();
-	}
-
 	/**
 	 * @param array<int|string,array<string,mixed>> $fields Submitted fields.
 	 * @param array<string,mixed> $entry Raw entry metadata.
 	 * @param array<string,mixed> $form_data Form definition.
 	 */
 	public function capture( array $fields, array $entry, array $form_data, int $entry_id ): void {
-		$feeds = $form_data['settings']['iwmm']['feeds'] ?? array();
-		if ( ! is_array( $feeds ) || array() === $feeds ) {
+		$feeds = $this->feeds( $form_data );
+		if ( array() === $feeds ) {
 			return;
 		}
 		$form_id = absint( $form_data['id'] ?? 0 );
@@ -72,7 +68,8 @@ final class FeedListener {
 		if ( ! is_array( $form_data ) ) {
 			return new WP_Error( 'iwmm_preview_form', 'Form data is invalid.' );
 		}
-		$feed = $form_data['settings']['iwmm']['feeds'][ $feed_id ] ?? null;
+		$feeds = $this->feeds( $form_data );
+		$feed  = $feeds[ $feed_id ] ?? null;
 		if ( ! is_array( $feed ) ) {
 			return new WP_Error( 'iwmm_preview_feed', 'Feed not found.' );
 		}
@@ -98,6 +95,17 @@ final class FeedListener {
 			$template = str_replace( '{field_id="' . $field_id . '"}', (string) ( $field['value'] ?? '' ), $template );
 		}
 		return $template;
+	}
+
+	/** @param array<string,mixed> $form_data @return array<string,array<string,mixed>> */
+	public function feeds( array $form_data ): array {
+		$feeds = $form_data['providers'][ Plugin::PROVIDER_SLUG ] ?? null;
+		if ( is_array( $feeds ) && array() !== $feeds ) {
+			return $feeds;
+		}
+
+		$legacy = $form_data['settings']['iwmm']['feeds'] ?? array();
+		return is_array( $legacy ) ? $legacy : array();
 	}
 
 	private function request_uuid(): string {

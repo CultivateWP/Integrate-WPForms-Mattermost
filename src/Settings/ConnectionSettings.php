@@ -36,13 +36,17 @@ final class ConnectionSettings {
 	}
 
 	public function configured(): bool {
-		return $this->valid_url( $this->base_url() ) && '' !== $this->token();
+		return $this->accepts_url( $this->base_url() ) && '' !== $this->token();
+	}
+
+	public function fully_managed_by_constants(): bool {
+		return defined( 'IWMM_MATTERMOST_URL' ) && defined( 'IWMM_MATTERMOST_TOKEN' );
 	}
 
 	public function save( string $base_url, string $token ): bool {
 		$current = $this->raw();
 		$url     = esc_url_raw( untrailingslashit( $base_url ) );
-		if ( '' !== $url && ! $this->valid_url( $url ) ) {
+		if ( '' !== $url && ! $this->accepts_url( $url ) ) {
 			throw new InvalidArgumentException( 'Mattermost must use HTTPS outside local development.' );
 		}
 		$data = array( 'base_url' => $url );
@@ -57,6 +61,15 @@ final class ConnectionSettings {
 		return update_option( self::OPTION, $data, false );
 	}
 
+	public function clear(): bool {
+		if ( $this->fully_managed_by_constants() ) {
+			return false;
+		}
+
+		delete_option( self::OPTION );
+		return true;
+	}
+
 	/**
 	 * @return array<string,mixed>
 	 */
@@ -65,7 +78,7 @@ final class ConnectionSettings {
 		return is_array( $value ) ? $value : array();
 	}
 
-	private function valid_url( string $url ): bool {
+	public function accepts_url( string $url ): bool {
 		$host   = (string) wp_parse_url( $url, PHP_URL_HOST );
 		$scheme = (string) wp_parse_url( $url, PHP_URL_SCHEME );
 		return '' !== $host && ( 'https' === $scheme || ( 'http' === $scheme && in_array( $host, array( 'localhost', '127.0.0.1', '::1' ), true ) ) );

@@ -29,7 +29,7 @@ final class Reconciler {
 		);
 		foreach ( $forms as $form ) {
 			$form_data = json_decode( (string) $form->post_content, true );
-			if ( ! is_array( $form_data ) || empty( $form_data['settings']['iwmm']['feeds'] ) ) {
+			if ( ! is_array( $form_data ) || array() === $this->listener->feeds( $form_data ) ) {
 				continue;
 			}
 			$form_data['id'] = (int) $form->ID;

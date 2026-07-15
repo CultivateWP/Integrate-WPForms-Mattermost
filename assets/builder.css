@@ -1,18 +1,28 @@
 .iwmm-feed {
-	background: #fff;
-	border: 1px solid #dcdcde;
 	margin: 0 0 16px;
-	padding: 16px;
 }
 
-.iwmm-feed label {
-	display: grid;
-	gap: 4px;
+.iwmm-feed .wpforms-builder-provider-connection-block > label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 6px;
 }
 
 .iwmm-condition {
 	display: grid;
-	grid-template-columns: 90px 1fr 1fr 28px;
+	grid-template-columns: minmax(140px, 1.2fr) minmax(120px, 1fr) minmax(120px, 1fr) 28px;
 	gap: 8px;
 	margin: 8px 0;
+}
+
+.iwmm-condition select,
+.iwmm-condition input {
+	min-width: 0;
+	width: 100%;
+}
+
+@media (max-width: 782px) {
+	.iwmm-condition {
+		grid-template-columns: 1fr;
+	}
 }

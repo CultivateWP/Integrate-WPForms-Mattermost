@@ -19,7 +19,8 @@
 	$(document).on('click', '.iwmm-add-feed', function () {
 		var id = feedUuid();
 		var html = $('#tmpl-iwmm-feed').html().replaceAll('__FEED__', id);
-		$('#iwmm-feeds').append(html);
+		var feed = $(html).appendTo('#iwmm-feeds');
+		feed.trigger('connectionRendered');
 	});
 
 	$(document).on('click', '.iwmm-remove-feed', function () {
@@ -30,12 +31,9 @@
 		var feed = $(this).closest('.iwmm-feed');
 		var feedId = feed.data('feed-id');
 		var conditionId = uniqueId('condition_');
-		var base = 'settings[iwmm][feeds][' + feedId + '][conditions][' + conditionId + ']';
-		var html = '<div class="iwmm-condition">' +
-			'<input type="number" min="1" placeholder="Field ID" name="' + base + '[field_id]">' +
-			'<select name="' + base + '[operator]"><option value="equals">Equals</option><option value="not_equals">Does not equal</option><option value="contains">Contains</option><option value="not_contains">Does not contain</option><option value="empty">Is empty</option><option value="not_empty">Is not empty</option></select>' +
-			'<input type="text" placeholder="Value" name="' + base + '[value]">' +
-			'<button type="button" class="button-link-delete iwmm-remove-condition" aria-label="Remove condition">&times;</button></div>';
+		var html = $('#tmpl-iwmm-condition').html()
+			.replaceAll('__FEED__', feedId)
+			.replaceAll('__CONDITION__', conditionId);
 		feed.find('.iwmm-conditions').append(html);
 	});
 
