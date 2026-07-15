@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<ruleset name="Integrate WPForms with Mattermost">
+	<description>Project coding standards.</description>
+	<file>integrate-wpforms-mattermost.php</file>
+	<file>src</file>
+	<exclude-pattern>vendor/*</exclude-pattern>
+	<arg name="extensions" value="php"/>
+	<arg value="sp"/>
+	<rule ref="Generic.PHP.Syntax"/>
+	<rule ref="WordPress.Security.EscapeOutput"/>
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array"><element value="integrate-wpforms-mattermost"/></property>
+		</properties>
+	</rule>
+</ruleset>

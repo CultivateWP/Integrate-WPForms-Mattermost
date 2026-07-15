@@ -1,0 +1,13 @@
+parameters:
+  level: 1
+  paths:
+    - integrate-wpforms-mattermost.php
+    - src
+  scanFiles:
+    - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+    - vendor/php-stubs/wp-cli-stubs/wp-cli-stubs.php
+  bootstrapFiles:
+    - tests/phpstan-bootstrap.php
+  tmpDir: /tmp/iwmm-phpstan
+  parallel:
+    maximumNumberOfProcesses: 1

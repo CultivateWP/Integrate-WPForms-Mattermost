@@ -1,0 +1,36 @@
+{
+  "name": "billerickson/integrate-wpforms-mattermost",
+  "description": "A reliable WPForms to Mattermost integration for WordPress.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "php": ">=8.1",
+    "woocommerce/action-scheduler": "^3.9"
+  },
+  "require-dev": {
+    "php-stubs/wordpress-stubs": "^6.6",
+    "php-stubs/wp-cli-stubs": "^2.0",
+    "phpstan/phpstan": "^2.1",
+    "phpunit/phpunit": "^10.5",
+    "squizlabs/php_codesniffer": "^3.10",
+    "wp-coding-standards/wpcs": "^3.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "IntegrateWPFormsMattermost\\": "src/"
+    }
+  },
+  "scripts": {
+    "test": "phpunit",
+    "lint": "phpcs --standard=phpcs.xml.dist",
+    "analyse": "phpstan analyse --configuration=phpstan.neon.dist --no-progress --debug --memory-limit=1G",
+    "syntax": "find src tests -name '*.php' -print0 | xargs -0 -n1 php -l"
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    },
+    "sort-packages": true
+  }
+}

@@ -1,0 +1,10 @@
+/vendor/
+/.phpunit.cache/
+/.phpcs-cache
+/build/
+/.DS_Store
+/.idea/
+/.vscode/
+/.env
+/auth.json
+/*-credentials.json
