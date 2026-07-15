@@ -11,13 +11,14 @@ use IntegrateWPFormsMattermost\WPForms\Provider\Settings\PageIntegrations;
 final class Core extends \WPForms\Providers\Provider\Core {
 	public const PRIORITY = 40;
 	public const SLUG = Plugin::PROVIDER_SLUG;
+	public const SETUP_URL = 'https://github.com/CultivateWP/Integrate-WPForms-Mattermost/blob/main/docs/MATTERMOST-BOT-SETUP.md';
 
 	public function __construct() {
 		parent::__construct(
 			array(
 				'slug' => self::SLUG,
 				'name' => __( 'Mattermost', 'integrate-wpforms-mattermost' ),
-				'icon' => IWMM_URL . 'assets/mattermost.svg',
+				'icon' => IWMM_URL . 'assets/mattermost.png',
 			)
 		);
 	}

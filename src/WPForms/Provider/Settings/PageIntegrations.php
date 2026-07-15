@@ -114,6 +114,11 @@ final class PageIntegrations extends \WPForms\Providers\Provider\Settings\PageIn
 				<?php endif; ?>
 			</label>
 		</p>
+		<p>
+			<a href="<?php echo esc_url( Core::SETUP_URL ); ?>" target="_blank" rel="noopener noreferrer">
+				<?php esc_html_e( 'How to create a Mattermost bot and access token', 'integrate-wpforms-mattermost' ); ?>
+			</a>
+		</p>
 		<p><?php esc_html_e( 'The bot token is encrypted before storage. Only teams and channels available to the bot will be listed.', 'integrate-wpforms-mattermost' ); ?></p>
 		<?php
 	}

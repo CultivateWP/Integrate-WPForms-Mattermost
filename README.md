@@ -25,7 +25,7 @@ A self-hosted WordPress plugin for sending configurable WPForms submission messa
 
 ## Installation
 
-Install a release ZIP as a normal WordPress plugin. Configure the Mattermost URL and bot token under **WPForms → Settings → Integrations → Mattermost**. Then edit a form and add one or more connections under **Marketing → Mattermost**.
+Install a release ZIP as a normal WordPress plugin. If you do not already have a bot token, follow the [Mattermost bot setup guide](docs/MATTERMOST-BOT-SETUP.md). Configure the Mattermost URL and bot token under **WPForms → Settings → Integrations → Mattermost**. Then edit a form and add one or more connections under **Marketing → Mattermost**.
 
 Queue history, saved-entry previews, channel refresh, confirmed test sends, and retries are available under **WPForms → Mattermost Logs**.
 

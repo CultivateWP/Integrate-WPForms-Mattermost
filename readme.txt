@@ -3,7 +3,7 @@ Contributors: billerickson
 Tags: wpforms, mattermost, automation, webhook
 Requires at least: 6.6
 Requires PHP: 8.1
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,10 @@ Create multiple conditional Mattermost feeds for each WPForms form. Messages sup
 5. Validate feeds in shadow mode before enabling live delivery.
 
 == Changelog ==
+
+= 1.1.1 =
+* Added the official Mattermost provider icon in WPForms.
+* Added a bot-account and access-token setup guide linked from the integration screen.
 
 = 1.1.0 =
 * Refactored account setup and form connections to use the native WPForms provider interface.

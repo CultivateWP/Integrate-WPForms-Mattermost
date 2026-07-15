@@ -33,7 +33,7 @@ final class FormBuilder extends \WPForms\Providers\Provider\Settings\FormBuilder
 
 			<?php if ( ! $configured ) : ?>
 				<div class="wpforms-builder-provider-connections-default">
-					<img src="<?php echo esc_url( IWMM_URL . 'assets/mattermost.svg' ); ?>" alt="">
+					<img src="<?php echo esc_url( IWMM_URL . 'assets/mattermost.png' ); ?>" alt="">
 					<div class="wpforms-builder-provider-settings-default-content">
 						<p><?php esc_html_e( 'Connect Mattermost under WPForms → Settings → Integrations before adding a form connection.', 'integrate-wpforms-mattermost' ); ?></p>
 						<p><a href="<?php echo esc_url( admin_url( 'admin.php?page=wpforms-settings&view=integrations&wpforms-integration=mattermost' ) ); ?>"><?php esc_html_e( 'Configure Mattermost', 'integrate-wpforms-mattermost' ); ?></a></p>
